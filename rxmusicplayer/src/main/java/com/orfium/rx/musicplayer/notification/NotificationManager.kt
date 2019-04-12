@@ -198,6 +198,7 @@ internal class NotificationManager(
             .setContentTitle(media?.title)
             .setContentText(media?.artist)
             .addAction(prev(service))
+            .setDeleteIntent(dismiss(service))
 
         if (state is PlaybackState.Paused || state is PlaybackState.Completed) {
             builder.addAction(play(service))
