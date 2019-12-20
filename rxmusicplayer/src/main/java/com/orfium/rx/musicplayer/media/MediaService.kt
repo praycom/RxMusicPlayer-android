@@ -24,7 +24,7 @@ internal class MediaService: Service(), Playback.ServiceCallback {
         const val ACTION_PREV  = "com.orfium.rx.musicplayer.previous"
         const val ACTION_NEXT  = "com.orfium.rx.musicplayer.next"
         const val ACTION_STOP  = "com.orfium.rx.musicplayer.stop"
-        const val EXTRA_NOTIFICATION_INTENT = "com.orfium.rx.musicplayer.media.NOTIFICATION_INTENT"
+        const val EXTRA_INTENT = "com.orfium.rx.musicplayer.intent"
         const val EXTRA_NOTIFICATION_ICON_RES = "com.orfium.rx.musicplayer.media.NOTIFICATION_ICON_RES"
     }
 
@@ -52,17 +52,23 @@ internal class MediaService: Service(), Playback.ServiceCallback {
 
     override fun onStartCommand(startIntent: Intent?, flags: Int, startId: Int): Int {
         if (startIntent != null) {
+            val extras = startIntent.extras
             val action = startIntent.action
-            if (action != null) {
-                executeTask(action)
+            when {
+                extras != null -> {
+
+                    if (extras.containsKey(EXTRA_INTENT)) {
+                        notificationManager.setIntent(startIntent.getParcelableExtra(EXTRA_INTENT))
+                    }
+                    if (extras.containsKey(EXTRA_NOTIFICATION_ICON_RES)) {
+                        notificationManager.setNotificationIconRes(startIntent.getIntExtra(EXTRA_NOTIFICATION_ICON_RES, 0))
+                    }
+
+                }
+                action != null -> executeTask(action)
             }
             MediaButtonReceiver.handleIntent(mediaSession, startIntent)
-            if (startIntent.hasExtra(EXTRA_NOTIFICATION_INTENT)) {
-                notificationManager.setNotificationIntent(startIntent.getParcelableExtra(EXTRA_NOTIFICATION_INTENT))
-            }
-            if (startIntent.hasExtra(EXTRA_NOTIFICATION_ICON_RES)) {
-                notificationManager.setNotificationIconRes(startIntent.getIntExtra(EXTRA_NOTIFICATION_ICON_RES, 0))
-            }
+
         }
         return START_NOT_STICKY
     }

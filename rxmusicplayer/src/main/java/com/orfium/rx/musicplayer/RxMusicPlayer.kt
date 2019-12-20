@@ -17,14 +17,16 @@ object RxMusicPlayer {
     private val playbackPositionSubject = PublishSubject.create<Long>()
 
     @JvmStatic
-    fun start(context: Context) {
-        context.startService(Intent(context, MediaService::class.java))
+    fun start(context: Context, intent: Intent? = null) {
+        context.startService(Intent(context, MediaService::class.java).apply {
+            putExtra(MediaService.EXTRA_INTENT, intent)
+        })
     }
 
     @JvmStatic
     fun start(context: Context, notificationIntent: Intent, notificationIconRes: Int) {
         val intent = Intent(context, MediaService::class.java)
-        intent.putExtra(MediaService.EXTRA_NOTIFICATION_INTENT, notificationIntent)
+        intent.putExtra(MediaService.EXTRA_INTENT, notificationIntent)
         intent.putExtra(MediaService.EXTRA_NOTIFICATION_ICON_RES, notificationIconRes)
         context.startService(intent)
     }
