@@ -1,6 +1,6 @@
 [![](https://jitpack.io/v/praycom/RxMusicPlayer-android.svg)](https://jitpack.io/#praycom/RxMusicPlayer-android) [![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-RxMusicPlayer-green.svg?style=flat )]( https://android-arsenal.com/details/1/7524 )
 
-# RxMusicPlayer
+# Pray Fork of RxMusicPlayer
 
 An android music player using ExoPlayer and RxJava2.
 
@@ -23,7 +23,7 @@ if you want to specify the activity you want to launch from notification
 
 ## Usage
 
-Create a [Media](https://github.com/Orfium/RxMusicPlayer-android/blob/master/rxmusicplayer/src/main/java/com/orfium/rx/musicplayer/media/Media.kt) item class that contains all the necessary data information and call playStop extension function on it.
+Create a [Media](https://github.com/praycom/RxMusicPlayer-android/blob/master/rxmusicplayer/src/main/java/com/orfium/rx/musicplayer/media/Media.kt) item class that contains all the necessary data information and call playStop extension function on it.
 
 Example:
 ```kotlin
@@ -44,7 +44,7 @@ media.addQueue()
 
 media.removeQueue()
 ```
-If you wish not to use the [extension functions](https://github.com/Orfium/RxMusicPlayer-android/blob/master/rxmusicplayer/src/main/java/com/orfium/rx/musicplayer/common/Extensions.kt) you can use RxMusicPlayer action to emit a new action that the MediaManager will handle. [Here](https://github.com/Orfium/RxMusicPlayer-android/blob/master/rxmusicplayer/src/main/java/com/orfium/rx/musicplayer/common/Action.kt) is the full list of actions that the MediaManager can handle
+If you wish not to use the [extension functions](https://github.com/praycom/RxMusicPlayer-android/blob/master/rxmusicplayer/src/main/java/com/orfium/rx/musicplayer/common/Extensions.kt) you can use RxMusicPlayer action to emit a new action that the MediaManager will handle. [Here](https://github.com/praycom/RxMusicPlayer-android/blob/master/rxmusicplayer/src/main/java/com/orfium/rx/musicplayer/common/Action.kt) is the full list of actions that the MediaManager can handle
 
 Example:
 ```kotlin
@@ -55,7 +55,7 @@ or
 RxMusicPlayer.action.onNext(Action.seek(position))
 ```
 
-To observe the changes on media player state just subscribe to RxMusicPlayer state, that will emit the current PlaybackState along with the current Media item on Queue. When a new observer subscribes to RxMusicPlayer state, it immediately gets notified about the current PlaybackState. You can find all states [here](https://github.com/Orfium/RxMusicPlayer-android/blob/master/rxmusicplayer/src/main/java/com/orfium/rx/musicplayer/common/PlaybackState.kt)
+To observe the changes on media player state just subscribe to RxMusicPlayer state, that will emit the current PlaybackState along with the current Media item on Queue. When a new observer subscribes to RxMusicPlayer state, it immediately gets notified about the current PlaybackState. You can find all states [here](https://github.com/praycom/RxMusicPlayer-android/blob/master/rxmusicplayer/src/main/java/com/orfium/rx/musicplayer/common/PlaybackState.kt)
 ```kotlin
 RxMusicPlayer.state
             .distinctUntilChanged()
@@ -66,7 +66,7 @@ RxMusicPlayer.state
                 }
             }
 ```
-A notification is provided by default when the state gets changes. You can configure notification's icons by overriding [them](https://github.com/Orfium/RxMusicPlayer-android/tree/master/rxmusicplayer/src/main/res/drawable). 
+A notification is provided by default when the state gets changes. You can configure notification's icons by overriding [them](https://github.com/praycom/RxMusicPlayer-android/tree/master/rxmusicplayer/src/main/res/drawable).
 
 RxMusicPlayer allows you to observe changes in media queue list and the current playback position of exoplayer
 ```kotlin
