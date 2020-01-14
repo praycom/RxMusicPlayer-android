@@ -32,22 +32,23 @@ class MainActivity : AppCompatActivity() {
                 .subscribe { state ->
                     when (state) {
                         is PlaybackState.Buffering -> {
-                            Log.d("PlaybackState Buffering", state.media?.toString())
+                            Log.d("PlaybackState Buffering", "position: ${state.position}, media: " + state.media?.toString())
                             adapter.notifyDataSetChanged()
                         }
                         is PlaybackState.Playing -> {
-                            Log.d("PlaybackState Playing", state.media?.toString())
+                            Log.d("PlaybackState Playing", "position: ${state.position}, media: " + state.media?.toString())
                             adapter.notifyDataSetChanged()
                         }
                         is PlaybackState.Paused -> {
-                            Log.d("PlaybackState Paused", state.media?.toString())
+                            Log.d("PlaybackState Paused", "position: ${state.position}, media: " + state.media?.toString())
                             adapter.notifyDataSetChanged()
                         }
                         is PlaybackState.Completed -> {
-                            Log.d("PlaybackState Completed", state.media?.toString())
+                            Log.d("PlaybackState Completed", "position: ${state.position}, media: " + state.media?.toString())
                             adapter.notifyDataSetChanged()
                         }
                         is PlaybackState.Stopped -> {
+                            Log.d("Playback Stopped", "position: ${state.position}")
                             // At this state MediaService gets destroyed, so RxMusicPlayer.start needs to be called again
                         }
                     }

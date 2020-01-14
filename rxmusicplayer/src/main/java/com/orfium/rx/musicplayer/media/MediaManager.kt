@@ -19,22 +19,22 @@ class MediaManager internal constructor(
     private val compositeDisposable = CompositeDisposable()
 
     override fun onBuffer() {
-        updatePlaybackState(PlaybackState.buffering(queue.current), playerCallback.position)
+        updatePlaybackState(PlaybackState.buffering(queue.current, playerCallback.position), playerCallback.position)
     }
 
     override fun onPlay() {
-        updatePlaybackState(PlaybackState.playing(queue.current), playerCallback.position)
+        updatePlaybackState(PlaybackState.playing(queue.current, playerCallback.position), playerCallback.position)
     }
 
     override fun onPause() {
-        updatePlaybackState(PlaybackState.paused(queue.current), playerCallback.position)
+        updatePlaybackState(PlaybackState.paused(queue.current, playerCallback.position), playerCallback.position)
     }
 
     override fun onCompletion() {
         if (queue.hasNext()) {
             play(queue.next)
         } else {
-            updatePlaybackState(PlaybackState.completed(queue.current), playerCallback.position)
+            updatePlaybackState(PlaybackState.completed(queue.current, playerCallback.position), playerCallback.position)
             playerCallback.complete()
         }
     }
@@ -118,13 +118,13 @@ class MediaManager internal constructor(
 
     private fun handleStopRequest() {
         playerCallback.stop()
-        updatePlaybackState(PlaybackState.stopped(), 0)
+        updatePlaybackState(PlaybackState.stopped(playerCallback.position), playerCallback.position)
     }
 
     private fun play(media: Media?) {
         playerCallback.play(media)
         serviceCallback.onPlaybackMediaChanged(media)
-        updatePlaybackState(PlaybackState.playing(media), playerCallback.position)
+        updatePlaybackState(PlaybackState.playing(media, playerCallback.position), playerCallback.position)
         onNextQueue()
     }
 

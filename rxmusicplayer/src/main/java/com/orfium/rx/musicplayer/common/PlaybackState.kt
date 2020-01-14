@@ -5,11 +5,11 @@ import com.orfium.rx.musicplayer.media.Media
 sealed class PlaybackState {
 
     object Idle : PlaybackState()
-    object Stopped : PlaybackState()
-    data class Buffering(var media: Media?) : PlaybackState()
-    data class Playing(var media: Media?) : PlaybackState()
-    data class Paused(var media: Media?) : PlaybackState()
-    data class Completed(var media: Media?) : PlaybackState()
+    data class Stopped(val position: Long = -1) : PlaybackState()
+    data class Buffering(var media: Media?, val position: Long = -1) : PlaybackState()
+    data class Playing(var media: Media?, val position: Long = -1) : PlaybackState()
+    data class Paused(var media: Media?, val position: Long = -1) : PlaybackState()
+    data class Completed(var media: Media?, val position: Long = -1) : PlaybackState()
 
     companion object {
         fun idle(): PlaybackState =
@@ -19,19 +19,19 @@ sealed class PlaybackState {
          * When this method gets called, MediaService gets destroyed.
          * [com.orfium.rx.musicplayer.RxMusicPlayer.start] method needs to be called again
          */
-        fun stopped(): PlaybackState =
-            Stopped
+        fun stopped(position: Long): PlaybackState =
+            Stopped(position)
 
-        fun buffering(media: Media?): PlaybackState =
-            Buffering(media)
+        fun buffering(media: Media?, position: Long): PlaybackState =
+            Buffering(media, position)
 
-        fun playing(media: Media?): PlaybackState =
-            Playing(media)
+        fun playing(media: Media?, position: Long): PlaybackState =
+            Playing(media, position)
 
-        fun paused(media: Media?): PlaybackState =
-            Paused(media)
+        fun paused(media: Media?, position: Long): PlaybackState =
+            Paused(media, position)
 
-        fun completed(media: Media?): PlaybackState =
-            Completed(media)
+        fun completed(media: Media?, position: Long): PlaybackState =
+            Completed(media, position)
     }
 }
