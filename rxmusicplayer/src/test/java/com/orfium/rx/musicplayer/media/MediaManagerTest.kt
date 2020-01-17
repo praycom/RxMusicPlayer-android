@@ -36,8 +36,8 @@ class MediaManagerTest {
     @Test
     fun testOnBufferThenStateChangedBuffering() {
         val media = createMedia()
-        val state = PlaybackState.buffering(media)
         val position = 0L
+        val state = PlaybackState.buffering(media, position)
 
         `when`(queue.current).thenReturn(media)
         `when`(playerCallback.position).thenReturn(position)
@@ -50,8 +50,8 @@ class MediaManagerTest {
     @Test
     fun testOnPlayThenStateChangedPlaying() {
         val media = createMedia()
-        val state = PlaybackState.playing(media)
         val position = 100L
+        val state = PlaybackState.playing(media, position)
 
         `when`(queue.current).thenReturn(media)
         `when`(playerCallback.position).thenReturn(position)
@@ -64,8 +64,8 @@ class MediaManagerTest {
     @Test
     fun testOnPauseThenStateChangedPaused() {
         val media = createMedia()
-        val state = PlaybackState.paused(media)
         val position = 1000L
+        val state = PlaybackState.paused(media, position)
 
         `when`(queue.current).thenReturn(media)
         `when`(playerCallback.position).thenReturn(position)
@@ -78,8 +78,8 @@ class MediaManagerTest {
     @Test
     fun testOnCompletionThenPlay() {
         val media = createMedia()
-        val state = PlaybackState.playing(media)
         val position = 0L
+        val state = PlaybackState.playing(media, position)
 
         `when`(queue.hasNext()).thenReturn(true)
         `when`(queue.next).thenReturn(media)
@@ -95,8 +95,8 @@ class MediaManagerTest {
     @Test
     fun testOnCompletionThenStateChangedCompleted() {
         val media = createMedia()
-        val state = PlaybackState.completed(media)
         val position = 5000L
+        val state = PlaybackState.completed(media, position)
 
         `when`(queue.current).thenReturn(media)
         `when`(playerCallback.position).thenReturn(position)
@@ -122,8 +122,8 @@ class MediaManagerTest {
         val media = createMedia()
         val list = listOf(media)
         val index = 0
-        val state = PlaybackState.playing(media)
         val position = 0L
+        val state = PlaybackState.playing(media, position)
         val action = Action.start(list, index)
 
         `when`(queue.current).thenReturn(media)
@@ -179,7 +179,7 @@ class MediaManagerTest {
         val previous = createMedia(id = 2)
         val position = 0L
         val action = Action.previous()
-        val state = PlaybackState.playing(previous)
+        val state = PlaybackState.playing(previous, position)
 
         `when`(playerCallback.position).thenReturn(position)
         `when`(queue.current).thenReturn(current)
@@ -200,7 +200,7 @@ class MediaManagerTest {
         val current = createMedia(id = 1)
         val position = 10000L
         val action = Action.previous()
-        val state = PlaybackState.playing(current)
+        val state = PlaybackState.playing(current, position)
 
         `when`(playerCallback.position).thenReturn(position)
         `when`(queue.current).thenReturn(current)
@@ -231,7 +231,7 @@ class MediaManagerTest {
         val media = createMedia()
         val position = 100L
         val action = Action.resume()
-        val state = PlaybackState.playing(media)
+        val state = PlaybackState.playing(media, position)
 
         `when`(queue.current).thenReturn(media)
         `when`(playerCallback.position).thenReturn(position)
@@ -250,7 +250,7 @@ class MediaManagerTest {
         val media = createMedia()
         val position = 100L
         val action = Action.next()
-        val state = PlaybackState.playing(media)
+        val state = PlaybackState.playing(media, position)
 
         `when`(queue.next).thenReturn(media)
         `when`(playerCallback.position).thenReturn(position)
