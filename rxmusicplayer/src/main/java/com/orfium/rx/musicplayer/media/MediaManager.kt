@@ -1,8 +1,8 @@
 package com.orfium.rx.musicplayer.media
 
 import com.orfium.rx.musicplayer.RxMusicPlayer
-import com.orfium.rx.musicplayer.common.PlaybackState
 import com.orfium.rx.musicplayer.common.Action
+import com.orfium.rx.musicplayer.common.PlaybackState
 import com.orfium.rx.musicplayer.common.QueueData
 import com.orfium.rx.musicplayer.playback.Playback
 import io.reactivex.Observable
