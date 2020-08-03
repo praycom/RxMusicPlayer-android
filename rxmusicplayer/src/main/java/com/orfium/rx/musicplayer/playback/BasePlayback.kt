@@ -4,20 +4,26 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.net.wifi.WifiManager
+import android.os.Build
+import android.os.Handler
+import androidx.annotation.RequiresApi
 import com.orfium.rx.musicplayer.media.Media
 
 internal abstract class BasePlayback(
-    protected val context: Context, private val audioManager: AudioManager,
+    protected val context: Context,
+    private val audioManager: AudioManager,
     private val wifiLock: WifiManager.WifiLock
-) : Playback.PlayerCallback, AudioManager.OnAudioFocusChangeListener {
+) : Playback.PlayerCallback {
 
     protected var playbackCallback: Playback.ManagerCallback? = null
+
     @Volatile
     protected var currentMedia: Media? = null
 
-    private var receiverRegistered = false
     private val audioBecomingNoisyIntent = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
 
     private val audioNoisyReceiver = object : BroadcastReceiver() {
@@ -27,6 +33,38 @@ internal abstract class BasePlayback(
             }
         }
     }
+
+    private val audioFocusChangeListener =
+        AudioManager.OnAudioFocusChangeListener { focusChange ->
+            when (focusChange) {
+                AudioManager.AUDIOFOCUS_GAIN -> {
+                    play(currentMedia)
+                }
+                AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> if (isPlaying) {
+                    pause()
+                }
+                AudioManager.AUDIOFOCUS_LOSS -> if (isPlaying) {
+                    pause()
+                }
+            }
+        }
+
+    private val handler = Handler()
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val audioFocusRequest =
+        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build()
+            )
+            .setAcceptsDelayedFocusGain(false)
+            .setOnAudioFocusChangeListener(audioFocusChangeListener, handler)
+            .build()
+
+    private var receiverRegistered = false
 
     abstract fun startPlayer()
 
@@ -68,24 +106,10 @@ internal abstract class BasePlayback(
 
     override fun stop() {
         releaseFocus()
-        unregisterWifiLock()
-        unregisterNoiseReceiver()
         stopPlayer()
         invalidateCurrent()
-    }
-
-    override fun onAudioFocusChange(focusChange: Int) {
-        when (focusChange) {
-            AudioManager.AUDIOFOCUS_GAIN -> {
-                play(currentMedia)
-            }
-            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> if (isPlaying) {
-                pause()
-            }
-            AudioManager.AUDIOFOCUS_LOSS -> if (isPlaying) {
-                pause()
-            }
-        }
+        unregisterWifiLock()
+        unregisterNoiseReceiver()
     }
 
     override fun setCallback(callback: Playback.ManagerCallback) {
@@ -93,11 +117,21 @@ internal abstract class BasePlayback(
     }
 
     private fun requestFocus() {
-        audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioManager.requestAudioFocus(audioFocusRequest)
+        } else {
+            @Suppress("DEPRECATION")
+            audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+        }
     }
 
     private fun releaseFocus() {
-        audioManager.abandonAudioFocus(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioManager.abandonAudioFocusRequest(audioFocusRequest)
+        } else {
+            @Suppress("DEPRECATION")
+            audioManager.abandonAudioFocus(audioFocusChangeListener)
+        }
     }
 
     private fun registerWifiLock() {
@@ -113,15 +147,18 @@ internal abstract class BasePlayback(
     }
 
     private fun registerNoiseReceiver() {
-        if(!receiverRegistered) {
+        if (!receiverRegistered) {
             context.registerReceiver(audioNoisyReceiver, audioBecomingNoisyIntent)
             receiverRegistered = true
         }
     }
 
     private fun unregisterNoiseReceiver() {
-        if(receiverRegistered) {
-            context.unregisterReceiver(audioNoisyReceiver)
+        if (receiverRegistered) {
+            try {
+                context.unregisterReceiver(audioNoisyReceiver)
+            } catch (ignore: IllegalAccessException) {
+            }
             receiverRegistered = false
         }
     }
