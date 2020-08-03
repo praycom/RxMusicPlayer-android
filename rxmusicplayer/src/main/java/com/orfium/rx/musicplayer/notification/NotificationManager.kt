@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.orfium.rx.musicplayer.R
@@ -100,6 +101,7 @@ internal class NotificationManager(
         hasStarted = false
         media = null
         notificationManager.cancel(NOTIFICATION_ID)
+        service.stopForeground(true)
         service.stopSelf()
     }
 
@@ -168,12 +170,16 @@ internal class NotificationManager(
                     .onlyRetrieveFromCache(true)
                     .priority(Priority.IMMEDIATE)
             )
-            .into(object : SimpleTarget<Bitmap>() {
+            .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     showNotification(builder, resource)
                 }
 
                 override fun onLoadFailed(errorDrawable: Drawable?) {
+                    showNotification(builder, null)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
                     showNotification(builder, null)
                 }
             })
@@ -233,6 +239,7 @@ internal class NotificationManager(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationCompat.Builder(service, notificationChannels.primaryChannel)
         } else {
+            @Suppress("DEPRECATION")
             NotificationCompat.Builder(service)
         }
     }
