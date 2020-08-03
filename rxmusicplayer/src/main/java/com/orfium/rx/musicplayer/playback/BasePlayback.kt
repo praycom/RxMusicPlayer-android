@@ -157,7 +157,7 @@ internal abstract class BasePlayback(
         if (receiverRegistered) {
             try {
                 context.unregisterReceiver(audioNoisyReceiver)
-            } catch (ignore: IllegalAccessException) {
+            } catch (ignore: IllegalArgumentException) {
             }
             receiverRegistered = false
         }
