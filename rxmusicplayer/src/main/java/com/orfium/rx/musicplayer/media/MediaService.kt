@@ -44,7 +44,9 @@ internal class MediaService: Service(), Playback.ServiceCallback {
             setCallback(MediaSessionCallback())
             setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
         }
-        notificationManager = Factory.createMediaNotification(this, mediaSession.sessionToken)
+        notificationManager = Factory.createMediaNotification(this, mediaSession.sessionToken).apply {
+            startNotification()
+        }
         mediaManager = Factory.createMediaManager(this).apply {
             subscribeQueue()
         }
