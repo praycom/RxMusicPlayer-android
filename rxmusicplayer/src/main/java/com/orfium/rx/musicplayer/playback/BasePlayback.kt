@@ -37,12 +37,26 @@ internal abstract class BasePlayback(
         AudioManager.OnAudioFocusChangeListener { focusChange ->
             when (focusChange) {
                 AudioManager.AUDIOFOCUS_GAIN -> {
-                    play(currentMedia)
+                    if (playbackDelayed || resumeOnFocusGain) {
+                        synchronized(focusLock) {
+                            resumeOnFocusGain = false
+                            playbackDelayed = false
+                        }
+                        play(currentMedia)
+                    }
                 }
-                AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> if (isPlaying) {
+                AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                    synchronized(focusLock) {
+                        resumeOnFocusGain = isPlaying
+                        playbackDelayed = false
+                    }
                     pause()
                 }
-                AudioManager.AUDIOFOCUS_LOSS -> if (isPlaying) {
+                AudioManager.AUDIOFOCUS_LOSS -> {
+                    synchronized(focusLock) {
+                        resumeOnFocusGain = false
+                        playbackDelayed = false
+                    }
                     pause()
                 }
             }
@@ -58,10 +72,16 @@ internal abstract class BasePlayback(
                     build()
                 }
             )
-            setAcceptsDelayedFocusGain(false)
+            setAcceptsDelayedFocusGain(true)
             setOnAudioFocusChangeListener(audioFocusChangeListener)
             build()
         }
+
+    private val focusLock = Any()
+
+    private var playbackDelayed = false
+
+    private var resumeOnFocusGain = false
 
     private var receiverRegistered = false
 
@@ -74,8 +94,7 @@ internal abstract class BasePlayback(
     abstract fun stopPlayer()
 
     override fun play(media: Media?) {
-        if (media != null) {
-            requestFocus()
+        if (media != null && requestFocus() == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             registerWifiLock()
             registerNoiseReceiver()
             if (media == currentMedia) {
@@ -104,8 +123,8 @@ internal abstract class BasePlayback(
     }
 
     override fun stop() {
-        releaseFocus()
         stopPlayer()
+        releaseFocus()
         invalidateCurrent()
         unregisterWifiLock()
         unregisterNoiseReceiver()
@@ -115,13 +134,21 @@ internal abstract class BasePlayback(
         playbackCallback = callback
     }
 
-    private fun requestFocus() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    private fun requestFocus(): Int {
+        val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioManager.requestAudioFocus(audioFocusRequest)
         } else {
             @Suppress("DEPRECATION")
             audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
         }
+
+        synchronized(focusLock) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                playbackDelayed = result == AudioManager.AUDIOFOCUS_REQUEST_DELAYED
+            }
+        }
+
+        return result
     }
 
     private fun releaseFocus() {
