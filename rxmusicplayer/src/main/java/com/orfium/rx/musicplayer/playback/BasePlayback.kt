@@ -9,7 +9,6 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.os.Handler
 import androidx.annotation.RequiresApi
 import com.orfium.rx.musicplayer.media.Media
 
@@ -49,20 +48,20 @@ internal abstract class BasePlayback(
             }
         }
 
-    private val handler = Handler()
-
     @RequiresApi(Build.VERSION_CODES.O)
     private val audioFocusRequest =
-        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build()
+        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
+            setAudioAttributes(
+                AudioAttributes.Builder().run {
+                    setUsage(AudioAttributes.USAGE_MEDIA)
+                    setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    build()
+                }
             )
-            .setAcceptsDelayedFocusGain(false)
-            .setOnAudioFocusChangeListener(audioFocusChangeListener, handler)
-            .build()
+            setAcceptsDelayedFocusGain(false)
+            setOnAudioFocusChangeListener(audioFocusChangeListener)
+            build()
+        }
 
     private var receiverRegistered = false
 

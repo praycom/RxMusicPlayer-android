@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="8dp"
-    android:paddingTop="4dp"
     android:paddingEnd="8dp"
+    android:paddingTop="4dp"
     android:paddingBottom="4dp">
 
     <ImageView
@@ -17,17 +18,19 @@
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/backgrounds/scenic" />
+        tools:src="@tools:sample/backgrounds/scenic"
+        tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/mediaStateIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_media_play"
-        app:layout_constraintBottom_toTopOf="@id/coverImage"
-        app:layout_constraintLeft_toRightOf="@id/coverImage"
-        app:layout_constraintRight_toLeftOf="@id/coverImage"
-        app:layout_constraintTop_toBottomOf="@id/coverImage" />
+        app:layout_constraintStart_toStartOf="@+id/coverImage"
+        app:layout_constraintEnd_toEndOf="@+id/coverImage"
+        app:layout_constraintTop_toTopOf="@+id/coverImage"
+        app:layout_constraintBottom_toBottomOf="@+id/coverImage"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/titleText"
@@ -51,7 +54,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toEndOf="@+id/coverImage"
-        app:layout_constraintTop_toBottomOf="@id/titleText"
+        app:layout_constraintTop_toBottomOf="@+id/titleText"
         tools:text="@tools:sample/lorem" />
 
     <ImageView
@@ -60,6 +63,7 @@
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_input_add"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="ContentDescription" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

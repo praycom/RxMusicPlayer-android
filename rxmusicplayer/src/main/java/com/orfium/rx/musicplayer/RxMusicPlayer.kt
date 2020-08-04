@@ -2,6 +2,7 @@ package com.orfium.rx.musicplayer
 
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import com.orfium.rx.musicplayer.common.Action
 import com.orfium.rx.musicplayer.common.PlaybackState
 import com.orfium.rx.musicplayer.common.QueueData
@@ -18,33 +19,39 @@ object RxMusicPlayer {
 
     @JvmStatic
     fun start(context: Context, intent: Intent? = null) {
-        context.startService(Intent(context, MediaService::class.java).apply {
-            putExtra(MediaService.EXTRA_INTENT, intent)
-        })
+        ContextCompat.startForegroundService(
+            context,
+            Intent(context, MediaService::class.java).apply {
+                putExtra(MediaService.EXTRA_INTENT, intent)
+            }
+        )
     }
 
     @JvmStatic
-    fun start(context: Context, notificationIntent: Intent, notificationIconRes: Int) {
-        val intent = Intent(context, MediaService::class.java)
-        intent.putExtra(MediaService.EXTRA_INTENT, notificationIntent)
-        intent.putExtra(MediaService.EXTRA_NOTIFICATION_ICON_RES, notificationIconRes)
-        context.startService(intent)
+    fun start(context: Context, intent: Intent, notificationIconRes: Int) {
+        ContextCompat.startForegroundService(
+            context,
+            Intent(context, MediaService::class.java).apply {
+                putExtra(MediaService.EXTRA_INTENT, intent)
+                putExtra(MediaService.EXTRA_NOTIFICATION_ICON_RES, notificationIconRes)
+            }
+        )
     }
 
     @JvmStatic
-    val state: BehaviorSubject<PlaybackState>
-        get() = playbackStateSubject
+    val state: BehaviorSubject<PlaybackState> =
+        playbackStateSubject
 
     @JvmStatic
-    val queue: BehaviorSubject<QueueData>
-        get() = queueSubject
+    val queue: BehaviorSubject<QueueData> =
+        queueSubject
 
     @JvmStatic
-    val action: PublishSubject<Action>
-        get() = actionSubject
+    val action: PublishSubject<Action> =
+        actionSubject
 
     @JvmStatic
-    val position: PublishSubject<Long>
-        get() = playbackPositionSubject
+    val position: PublishSubject<Long> =
+        playbackPositionSubject
 
 }
