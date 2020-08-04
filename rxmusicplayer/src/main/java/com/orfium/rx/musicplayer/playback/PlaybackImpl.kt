@@ -23,12 +23,7 @@ internal class PlaybackImpl(
     wifiLock: WifiManager.WifiLock
 ) : BasePlayback(context, audioManager, wifiLock), Player.EventListener {
 
-    private val player = SimpleExoPlayer.Builder(context)
-        .run {
-            setTrackSelector(DefaultTrackSelector(context))
-            setLoadControl(DefaultLoadControl())
-            build()
-        }
+    private val player = SimpleExoPlayer.Builder(context).build()
         .apply {
             audioAttributes = AudioAttributes.Builder().run {
                 setUsage(C.USAGE_MEDIA)
