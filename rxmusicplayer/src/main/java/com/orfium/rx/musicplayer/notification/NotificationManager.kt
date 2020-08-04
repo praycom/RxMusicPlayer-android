@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Handler
 import android.support.v4.media.session.MediaSessionCompat
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -42,6 +43,7 @@ internal class NotificationManager(
         private const val STOP_PENDING_INTENT_ID = 60
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private lateinit var notificationChannels: NotificationChannels
     private var intent: Intent? = null
 
@@ -190,7 +192,7 @@ internal class NotificationManager(
                 .setMediaSession(token)
                 .setShowActionsInCompactView(0, 1, 2)
             )
-            .setPriority(Notification.PRIORITY_MAX)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setUsesChronometer(false)
             .setSmallIcon(notificationIconRes)
@@ -198,7 +200,6 @@ internal class NotificationManager(
             .setOnlyAlertOnce(true)
             .setContentTitle(media?.title)
             .setContentText(media?.artist)
-            .setDeleteIntent(dismiss(service))
             .setDeleteIntent(dismiss(service))
 
         if (state !is PlaybackState.Idle) {

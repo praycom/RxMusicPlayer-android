@@ -1,6 +1,6 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 
 android {
@@ -11,12 +11,13 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.versionCode
         versionName rootProject.versionName
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
     androidExtensions {
@@ -29,10 +30,12 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(":rxmusicplayer")
+
+    kapt "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
 
     // Kotlin Dependencies
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion"
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk8:$rootProject.kotlinVersion"
 
     // Android Dependencies
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
@@ -40,17 +43,7 @@ dependencies {
     implementation "com.google.android.material:material:$rootProject.materialVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
 
-    // Rx Dependencies
-    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxJavaVersion"
-    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxAndroidVersion"
-
-    implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
-    kapt "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
-
-    implementation project(':rxmusicplayer')
-
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation "androidx.test:runner:$rootProject.runnerVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoVersion"
-
 }

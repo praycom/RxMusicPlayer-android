@@ -117,10 +117,10 @@ internal class MediaService: Service(), Playback.ServiceCallback {
                 PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
                 PlaybackStateCompat.ACTION_SET_REPEAT_MODE or
                 PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
-        if (state is PlaybackState.Playing || state is PlaybackState.Buffering) {
-            actions = actions or PlaybackStateCompat.ACTION_PAUSE
+        actions = if (state is PlaybackState.Playing || state is PlaybackState.Buffering) {
+            actions or PlaybackStateCompat.ACTION_PAUSE
         } else {
-            actions = actions or PlaybackStateCompat.ACTION_PLAY
+            actions or PlaybackStateCompat.ACTION_PLAY
         }
         return actions
     }

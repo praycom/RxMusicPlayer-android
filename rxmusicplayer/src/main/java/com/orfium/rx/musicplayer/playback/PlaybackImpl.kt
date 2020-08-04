@@ -4,10 +4,14 @@ import android.content.Context
 import android.media.AudioManager
 import android.net.Uri
 import android.net.wifi.WifiManager
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
-import com.google.android.exoplayer2.source.ExtractorMediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
@@ -19,13 +23,19 @@ internal class PlaybackImpl(
     wifiLock: WifiManager.WifiLock
 ) : BasePlayback(context, audioManager, wifiLock), Player.EventListener {
 
-    private var player: SimpleExoPlayer = ExoPlayerFactory.newSimpleInstance(
-        context, DefaultRenderersFactory(context), DefaultTrackSelector(), DefaultLoadControl()
-    ).apply {
-        audioAttributes = AudioAttributes.Builder()
-            .setContentType(C.CONTENT_TYPE_MUSIC)
-            .build()
-    }
+    private val player = SimpleExoPlayer.Builder(context)
+        .run {
+            setTrackSelector(DefaultTrackSelector(context))
+            setLoadControl(DefaultLoadControl())
+            build()
+        }
+        .apply {
+            audioAttributes = AudioAttributes.Builder().run {
+                setUsage(C.USAGE_MEDIA)
+                setContentType(C.CONTENT_TYPE_SPEECH)
+                build()
+            }
+        }
 
     override val isPlaying: Boolean
         get() = player.playWhenReady
@@ -67,7 +77,7 @@ internal class PlaybackImpl(
         }
     }
 
-    override fun onPlayerError(error: ExoPlaybackException?) {
+    override fun onPlayerError(error: ExoPlaybackException) {
         playbackCallback?.onError()
     }
 
@@ -75,8 +85,7 @@ internal class PlaybackImpl(
         val dataSourceFactory = DefaultDataSourceFactory(
             context, Util.getUserAgent(context, context.getString(R.string.app_name)), null
         )
-        val mediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
-            .setExtractorsFactory(DefaultExtractorsFactory())
+        val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory, DefaultExtractorsFactory())
             .createMediaSource(Uri.parse(currentMedia?.streamUrl))
         player.addListener(this)
         player.prepare(mediaSource)
