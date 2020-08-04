@@ -127,7 +127,6 @@ internal class NotificationManager(
     private fun stopNotification() {
         hasStarted = false
         media = null
-        notificationManager.cancel(NOTIFICATION_ID)
         service.stopForeground(true)
         service.stopSelf()
     }
