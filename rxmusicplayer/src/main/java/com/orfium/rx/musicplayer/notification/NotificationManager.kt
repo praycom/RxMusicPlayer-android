@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Handler
 import android.support.v4.media.session.MediaSessionCompat
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -17,7 +18,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.orfium.rx.musicplayer.R
 import com.orfium.rx.musicplayer.common.PlaybackState
@@ -42,6 +43,7 @@ internal class NotificationManager(
         private const val STOP_PENDING_INTENT_ID = 60
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private lateinit var notificationChannels: NotificationChannels
     private var intent: Intent? = null
 
@@ -80,6 +82,32 @@ internal class NotificationManager(
         this.notificationIconRes = notificationIconRes
     }
 
+    fun startNotification() {
+        val builder = createBuilder()
+        Glide.with(service)
+            .asBitmap()
+            .load(media?.image)
+            .apply(
+                RequestOptions
+                    .diskCacheStrategyOf(DiskCacheStrategy.DATA)
+                    .onlyRetrieveFromCache(true)
+                    .priority(Priority.IMMEDIATE)
+            )
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    showNotification(builder, resource)
+                }
+
+                override fun onLoadFailed(errorDrawable: Drawable?) {
+                    showNotification(builder, null)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                    showNotification(builder, null)
+                }
+            })
+    }
+
     private fun updateNotification() {
         if (!hasStarted) {
             val intent = Intent(service, MediaService::class.java)
@@ -99,7 +127,7 @@ internal class NotificationManager(
     private fun stopNotification() {
         hasStarted = false
         media = null
-        notificationManager.cancel(NOTIFICATION_ID)
+        service.stopForeground(true)
         service.stopSelf()
     }
 
@@ -157,39 +185,13 @@ internal class NotificationManager(
         )
     }
 
-    private fun startNotification() {
-        val builder = createBuilder()
-        Glide.with(service)
-            .asBitmap()
-            .load(media?.image)
-            .apply(
-                RequestOptions
-                    .diskCacheStrategyOf(DiskCacheStrategy.DATA)
-                    .onlyRetrieveFromCache(true)
-                    .priority(Priority.IMMEDIATE)
-            )
-            .into(object : SimpleTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    showNotification(builder, resource)
-                }
-
-                override fun onLoadFailed(errorDrawable: Drawable?) {
-                    showNotification(builder, null)
-                }
-            })
-    }
-
     private fun showNotification(builder: NotificationCompat.Builder, bitmap: Bitmap?) {
-        if (media == null || state == PlaybackState.Idle) {
-            return
-        }
-
         builder.setStyle(
             androidx.media.app.NotificationCompat.MediaStyle()
                 .setMediaSession(token)
                 .setShowActionsInCompactView(0, 1, 2)
             )
-            .setPriority(Notification.PRIORITY_MAX)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setUsesChronometer(false)
             .setSmallIcon(notificationIconRes)
@@ -198,17 +200,21 @@ internal class NotificationManager(
             .setContentTitle(media?.title)
             .setContentText(media?.artist)
             .setDeleteIntent(dismiss(service))
-            .addAction(prev(service))
-            .setDeleteIntent(dismiss(service))
 
-        if (state is PlaybackState.Paused || state is PlaybackState.Completed) {
-            builder.addAction(play(service))
-            builder.setOngoing(false)
-        } else {
-            builder.addAction(pause(service))
-            builder.setOngoing(true)
+        if (state !is PlaybackState.Idle) {
+            builder.addAction(prev(service))
+
+            if (state is PlaybackState.Paused || state is PlaybackState.Completed) {
+                builder.addAction(play(service))
+                builder.setOngoing(false)
+            } else {
+                builder.addAction(pause(service))
+                builder.setOngoing(true)
+            }
+
+            builder.addAction(next(service))
         }
-        builder.addAction(next(service))
+
         builder.setLargeIcon(bitmap)
 
         val notificationIntent = intent ?: Intent()
@@ -233,6 +239,7 @@ internal class NotificationManager(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationCompat.Builder(service, notificationChannels.primaryChannel)
         } else {
+            @Suppress("DEPRECATION")
             NotificationCompat.Builder(service)
         }
     }

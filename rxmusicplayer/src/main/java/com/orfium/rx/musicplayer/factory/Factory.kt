@@ -22,7 +22,9 @@ internal object Factory {
             mediaQueue,
             playerCallback,
             serviceCallback
-        ).apply { playerCallback.setCallback(this) }
+        ).apply {
+            playerCallback.setCallback(this)
+        }
     }
 
     fun createMediaNotification(service: Service, token: MediaSessionCompat.Token): NotificationManager {
@@ -51,7 +53,7 @@ internal object Factory {
     private fun createWifiManager(context: Context): WifiManager.WifiLock {
         return (context.applicationContext
             .getSystemService(Context.WIFI_SERVICE) as WifiManager)
-            .createWifiLock(WifiManager.WIFI_MODE_FULL, context.getString(R.string.app_name))
+            .createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, context.getString(R.string.app_name))
     }
 
     private fun createNotificationManager(context: Context): NotificationManagerCompat {
