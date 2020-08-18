@@ -186,6 +186,11 @@ internal class NotificationManager(
     }
 
     private fun showNotification(builder: NotificationCompat.Builder, bitmap: Bitmap?) {
+
+        if (media == null || state == PlaybackState.Idle) {
+            return
+        }
+
         builder.setStyle(
             androidx.media.app.NotificationCompat.MediaStyle()
                 .setMediaSession(token)
