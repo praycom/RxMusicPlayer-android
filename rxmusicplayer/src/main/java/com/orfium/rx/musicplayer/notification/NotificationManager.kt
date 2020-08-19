@@ -21,6 +21,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.orfium.rx.musicplayer.R
+import com.orfium.rx.musicplayer.RxMusicPlayer
 import com.orfium.rx.musicplayer.common.PlaybackState
 import com.orfium.rx.musicplayer.media.Media
 import com.orfium.rx.musicplayer.media.MediaService
@@ -29,7 +30,7 @@ internal class NotificationManager(
     private val service: Service,
     private val token: MediaSessionCompat.Token,
     private val notificationManager: NotificationManagerCompat,
-    private var notificationIconRes: Int = R.mipmap.ic_notification_small
+    private var notificationIconRes: Int = RxMusicPlayer.notificationIconRes
 ) {
 
     companion object {
