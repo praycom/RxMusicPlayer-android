@@ -21,6 +21,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.orfium.rx.musicplayer.R
+import com.orfium.rx.musicplayer.RxMusicPlayer
 import com.orfium.rx.musicplayer.common.PlaybackState
 import com.orfium.rx.musicplayer.media.Media
 import com.orfium.rx.musicplayer.media.MediaService
@@ -29,7 +30,7 @@ internal class NotificationManager(
     private val service: Service,
     private val token: MediaSessionCompat.Token,
     private val notificationManager: NotificationManagerCompat,
-    private var notificationIconRes: Int = R.mipmap.ic_notification_small
+    private var notificationIconRes: Int = RxMusicPlayer.notificationIconRes
 ) {
 
     companion object {
@@ -189,7 +190,6 @@ internal class NotificationManager(
         builder.setStyle(
             androidx.media.app.NotificationCompat.MediaStyle()
                 .setMediaSession(token)
-                .setShowActionsInCompactView(0, 1, 2)
             )
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -197,11 +197,17 @@ internal class NotificationManager(
             .setSmallIcon(notificationIconRes)
             .setShowWhen(false)
             .setOnlyAlertOnce(true)
-            .setContentTitle(media?.title)
+            .setContentTitle(media?.title ?: service.getString(R.string.player_initialization))
             .setContentText(media?.artist)
             .setDeleteIntent(dismiss(service))
 
         if (state !is PlaybackState.Idle) {
+            builder.setStyle(
+                androidx.media.app.NotificationCompat.MediaStyle()
+                    .setMediaSession(token)
+                    .setShowActionsInCompactView(0, 1, 2)
+            )
+
             builder.addAction(prev(service))
 
             if (state is PlaybackState.Paused || state is PlaybackState.Completed) {

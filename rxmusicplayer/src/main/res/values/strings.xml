@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RxMusicPlayer</string>
+    <string name="player_initialization">Player initialization&#8230;</string>
 </resources>
