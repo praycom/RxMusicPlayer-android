@@ -196,7 +196,7 @@ internal class NotificationManager(
             .setSmallIcon(notificationIconRes)
             .setShowWhen(false)
             .setOnlyAlertOnce(true)
-            .setContentTitle(media?.title)
+            .setContentTitle(media?.title ?: service.getString(R.string.player_initialization))
             .setContentText(media?.artist)
             .setDeleteIntent(dismiss(service))
 
