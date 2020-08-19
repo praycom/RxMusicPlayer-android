@@ -51,11 +51,9 @@ task sourcesJar(type: Jar) {
 afterEvaluate {
     publishing {
         publications {
-            maven(MavenPublication) {
-                groupId = "com.github.praycom"
+            release(MavenPublication) {
                 artifactId = "RxMusicPlayer-android"
-                version = rootProject.versionName
-                from components.all
+                from components.release
                 artifact sourcesJar
             }
         }
