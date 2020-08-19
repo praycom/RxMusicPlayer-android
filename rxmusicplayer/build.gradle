@@ -53,7 +53,7 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 artifactId = "RxMusicPlayer-android"
-                from components.all
+                from components.release
                 artifact sourcesJar
             }
         }
