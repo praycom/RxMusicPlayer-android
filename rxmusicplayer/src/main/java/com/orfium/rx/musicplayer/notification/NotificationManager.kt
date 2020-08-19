@@ -186,15 +186,9 @@ internal class NotificationManager(
     }
 
     private fun showNotification(builder: NotificationCompat.Builder, bitmap: Bitmap?) {
-
-        if (media == null || state == PlaybackState.Idle) {
-            return
-        }
-
         builder.setStyle(
             androidx.media.app.NotificationCompat.MediaStyle()
                 .setMediaSession(token)
-                .setShowActionsInCompactView(0, 1, 2)
             )
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -207,6 +201,12 @@ internal class NotificationManager(
             .setDeleteIntent(dismiss(service))
 
         if (state !is PlaybackState.Idle) {
+            builder.setStyle(
+                androidx.media.app.NotificationCompat.MediaStyle()
+                    .setMediaSession(token)
+                    .setShowActionsInCompactView(0, 1, 2)
+            )
+
             builder.addAction(prev(service))
 
             if (state is PlaybackState.Paused || state is PlaybackState.Completed) {
