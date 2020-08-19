@@ -17,6 +17,14 @@ object RxMusicPlayer {
     private val actionSubject = PublishSubject.create<Action>()
     private val playbackPositionSubject = PublishSubject.create<Long>()
 
+    var notificationIconRes: Int = R.mipmap.ic_notification_small
+        private set
+
+    @JvmStatic
+    fun setNotificationIconRes(notificationIconRes: Int) {
+        this.notificationIconRes = notificationIconRes
+    }
+
     @JvmStatic
     fun start(context: Context, intent: Intent? = null) {
         ContextCompat.startForegroundService(
