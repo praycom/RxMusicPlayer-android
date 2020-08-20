@@ -62,28 +62,21 @@ internal abstract class BasePlayback(
             }
         }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private val audioFocusRequest =
-        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
-            setAudioAttributes(
-                AudioAttributes.Builder().run {
-                    setUsage(AudioAttributes.USAGE_MEDIA)
-                    setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    build()
-                }
-            )
-            setAcceptsDelayedFocusGain(true)
-            setOnAudioFocusChangeListener(audioFocusChangeListener)
-            build()
-        }
-
     private val focusLock = Any()
+
+    private var audioFocusRequest: AudioFocusRequest? = null
 
     private var playbackDelayed = false
 
     private var resumeOnFocusGain = false
 
     private var receiverRegistered = false
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioFocusRequest = createAudioFocusRequest()
+        }
+    }
 
     abstract fun startPlayer()
 
@@ -134,9 +127,24 @@ internal abstract class BasePlayback(
         playbackCallback = callback
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createAudioFocusRequest(): AudioFocusRequest =
+        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
+            setAudioAttributes(
+                AudioAttributes.Builder().run {
+                    setUsage(AudioAttributes.USAGE_MEDIA)
+                    setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    build()
+                }
+            )
+            setAcceptsDelayedFocusGain(true)
+            setOnAudioFocusChangeListener(audioFocusChangeListener)
+            build()
+        }
+
     private fun requestFocus(): Int {
         val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            audioManager.requestAudioFocus(audioFocusRequest)
+            audioManager.requestAudioFocus(audioFocusRequest!!)
         } else {
             @Suppress("DEPRECATION")
             audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
@@ -153,7 +161,7 @@ internal abstract class BasePlayback(
 
     private fun releaseFocus() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            audioManager.abandonAudioFocusRequest(audioFocusRequest)
+            audioManager.abandonAudioFocusRequest(audioFocusRequest!!)
         } else {
             @Suppress("DEPRECATION")
             audioManager.abandonAudioFocus(audioFocusChangeListener)
@@ -188,5 +196,4 @@ internal abstract class BasePlayback(
             receiverRegistered = false
         }
     }
-
 }
