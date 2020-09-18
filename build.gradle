@@ -9,10 +9,10 @@ buildscript {
 
         // App version
         versionCode = 2
-        versionName = "1.1.0.6"
+        versionName = "1.1.0.7"
 
         // Kotlin
-        kotlinVersion = "1.4.0"
+        kotlinVersion = "1.4.10"
 
         // AndroidX
         appcompatVersion = "1.3.0-alpha01"
@@ -25,7 +25,7 @@ buildscript {
         rxAndroidVersion = "2.1.1"
 
         // ExoPlayer
-        exoPlayerVersion = "2.11.1"
+        exoPlayerVersion = "2.11.8"
 
         // Glide
         glideVersion = "4.11.0"

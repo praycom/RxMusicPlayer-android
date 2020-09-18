@@ -7,6 +7,7 @@ import android.net.wifi.WifiManager
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.app.NotificationManagerCompat
 import com.orfium.rx.musicplayer.R
+import com.orfium.rx.musicplayer.RxMusicPlayer
 import com.orfium.rx.musicplayer.media.MediaManager
 import com.orfium.rx.musicplayer.media.MediaQueue
 import com.orfium.rx.musicplayer.notification.NotificationManager
@@ -42,7 +43,8 @@ internal object Factory {
         return PlaybackImpl(
             context,
             createAudioManager(context),
-            createWifiManager(context)
+            createWifiManager(context),
+            RxMusicPlayer.analyticsListener
         )
     }
 
