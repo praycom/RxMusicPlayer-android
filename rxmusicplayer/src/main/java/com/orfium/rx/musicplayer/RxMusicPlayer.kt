@@ -3,6 +3,7 @@ package com.orfium.rx.musicplayer
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.orfium.rx.musicplayer.common.Action
 import com.orfium.rx.musicplayer.common.PlaybackState
 import com.orfium.rx.musicplayer.common.QueueData
@@ -20,9 +21,17 @@ object RxMusicPlayer {
     var notificationIconRes: Int = R.mipmap.ic_notification_small
         private set
 
+    var analyticsListener: AnalyticsListener? = null
+        private set
+
     @JvmStatic
     fun setNotificationIconRes(notificationIconRes: Int) {
         this.notificationIconRes = notificationIconRes
+    }
+
+    @JvmStatic
+    fun setAnalyticsListener(analyticsListener: AnalyticsListener) {
+        this.analyticsListener = analyticsListener
     }
 
     @JvmStatic
